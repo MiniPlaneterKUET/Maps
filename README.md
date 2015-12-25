@@ -1,6 +1,6 @@
 # Maps
 
-** Successfully getting direction from one place to another **
+**Successfully getting direction from one place to another**
 
 ## Dependencies
 
