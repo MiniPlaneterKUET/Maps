@@ -30,21 +30,21 @@ import java.util.*;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener, DirectionCallback {
 
-    double originLat = 23.737259;
-    double originLong = 90.382750;
+    double originLat = 22.898385;
+    double originLong = 89.501238;
 
-    double destinationLat = 23.726760;
-    double destinationLong = 90.421376;
+    double destinationLat = 22.899161;
+    double destinationLong = 89.502820;
 
     private GoogleMap googleMap;
     private static final String SERVER_KEY = "AIzaSyCtqKtRtaSzQJ8qYnRs9kBY4UiRqFNLsKI";
-//    private LatLng camera = new LatLng(originLat, originLong);
-//    private LatLng origin = new LatLng(originLat, originLong);
-//    private LatLng destination = new LatLng(destinationLat, destinationLong);
+    private LatLng camera = new LatLng(originLat, originLong);
+    private LatLng origin = new LatLng(originLat, originLong);
+    private LatLng destination = new LatLng(destinationLat, destinationLong);
 
-    private LatLng camera = new LatLng(22.8991066, 89.5018581);
-    private LatLng origin = new LatLng(22.8991066, 89.5018581);
-    private LatLng destination = new LatLng(22.8983666, 89.5012359);
+//    private LatLng camera = new LatLng(22.8991066, 89.5018581);
+//    private LatLng origin = new LatLng(22.8991066, 89.5018581);
+//    private LatLng destination = new LatLng(22.8983666, 89.5012359);
 
     private Button requestBtn;
 
@@ -58,7 +58,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ArrayList<String> directions;
     private ArrayList<LatLng> reversedLatLng;
-
+    private ArrayList<String> caughtDirections;
+    private ArrayList<String> finalDirections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +120,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             reversedLatLng = new ArrayList<>(sectionPositionList);
 
+            caughtDirections = new ArrayList<>();
+            finalDirections = new ArrayList<>();
+
             Collections.reverse(reversedLatLng);
 
             for (LatLng pos : sectionPositionList){
@@ -158,72 +162,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //Start
 
-            for (int i = 1; i < reversedLatLng.size() - 1; i++){
+            for (int i = 1; i < sectionPositionList.size() - 1; i++){
 
-                boolean largeLat = false;
-                boolean largeLong = false;
-                boolean firstLong = false;
-                boolean firstLat = false;
-                boolean secondLat = false;
-                boolean secondLong = false;
-
-                Log.i(TAG, "INSIDE REVERESED LATLNG");
-                Log.i(TAG, "Latitude: " + reversedLatLng.get(i).latitude);
-                Log.i(TAG, "Longitude: " + reversedLatLng.get(i).longitude);
-
-                Log.i(TAG, "INSIDE REVERESED LATLNG 2");
-                Log.i(TAG, "Latitude: " + reversedLatLng.get(i + 1).latitude);
-                Log.i(TAG, "Longitude: " + reversedLatLng.get(i + 1).longitude);
-
-
-                LatLng first = sectionPositionList.get(i);
-                LatLng second = sectionPositionList.get(i + 1);
-
-                double compareLongitude = second.longitude - first.longitude;
-                double compareLatitude = second.latitude - first.latitude;
-
-
-                if (compareLatitude > compareLongitude) largeLat = true;
-                else largeLong = true;
-
-                if (largeLat == true){
-                    if (compareLatitude > 0) {
-                        secondLat = true;
-                        Log.i(TAG, "2nd Latitude > 1st");
-                    }
-                    else {
-                        firstLat = true;
-                        Log.i(TAG, "1st Latitude > 2nd");
-                    }
-                }
-
-                if (largeLong == true){
-                    if (compareLongitude > 0) {
-                        secondLong = true;
-                        Log.i(TAG, "2nd Longitude > 1st");
-                    }
-                    else {
-                        firstLong = true;
-                        Log.i(TAG, "1st Longitude > 2nd");
-                    }
-                }
-
-                if (secondLat == true) directions.add(FORWARD);
-                if (firstLat == true) directions.add(BACKWARD);
-                if (secondLong == true) directions.add(RIGHT);
-                if (firstLong == true) directions.add(LEFT);
-
-
-
-
-                Log.i(TAG, "COMPARED LATITUDE: " + compareLatitude);
-                Log.i(TAG, "COMPARED LONGITUDE: "  + compareLongitude);
-
-
-
-
-
-
+                caughtDirections.add(getDirection(sectionPositionList.get(i), sectionPositionList.get(i+1)));
+                caughtDirections.add(getDirection(sectionPositionList.get(i-1), sectionPositionList.get
+                        (i+1)));
 
 
 //                if (compareLatitude > compareLongitude) { largeLat = true; Log.i(TAG, "LARGELAT " +
@@ -251,6 +194,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
 
+            Log.i(TAG, "Caught Directions Start");
+            for (String dir : caughtDirections){
+                Log.i(TAG, dir);
+            }
+            Log.i(TAG, "Caught Directions End");
+
+
+            for (int i = 0; i < caughtDirections.size() - 1; i+=2){
+                finalDirections.add(getFinalDirections(caughtDirections.get(i), caughtDirections.get(i+1)));
+            }
+
+            Log.i(TAG, "Final Directions");
+            for (String dir : finalDirections){
+                Log.i(TAG, dir);
+            }
+            Log.i(TAG, "Final Direction end");
             //End
 
 
@@ -270,9 +229,80 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.i(TAG, dir);
         }
 
-
-
     }
+
+
+    //Returns direction
+    public String getDirection(LatLng first, LatLng second){
+
+        boolean largeLat = false;
+        boolean largeLong = false;
+        boolean firstLong = false;
+        boolean firstLat = false;
+        boolean secondLat = false;
+        boolean secondLong = false;
+
+
+        double compareLongitude = second.longitude - first.longitude;
+        double compareLatitude = second.latitude - first.latitude;
+
+
+                if (compareLatitude > compareLongitude) largeLat = true;
+                else largeLong = true;
+
+        if (largeLat == true){
+            if (compareLatitude > 0) {
+                secondLat = true;
+                Log.i(TAG, "2nd Latitude > 1st");
+            }
+            else {
+                firstLat = true;
+                Log.i(TAG, "1st Latitude > 2nd");
+            }
+        }
+
+        if (largeLong == true){
+            if (compareLongitude > 0) {
+                secondLong = true;
+                Log.i(TAG, "2nd Longitude > 1st");
+            }
+            else {
+                firstLong = true;
+                Log.i(TAG, "1st Longitude > 2nd");
+            }
+        }
+
+        if (secondLat == true)  { Log.i(TAG, FORWARD);  return FORWARD; }
+        if (firstLat == true) {
+            Log.i(TAG, BACKWARD);
+            return BACKWARD;
+        }
+        if (secondLong == true) {
+            Log.i(TAG, RIGHT);
+            return RIGHT;
+        }
+        if (firstLong == true) {
+            Log.i(TAG, LEFT);
+            return LEFT;
+        }
+
+        return "";
+    }
+
+
+    public String getFinalDirections(String first, String second){
+        if (first.equals(BACKWARD) && second.equals(RIGHT)) return RIGHT;
+        else if (first.equals(BACKWARD) && second.equals(LEFT)) return LEFT;
+        else if (first.equals(FORWARD) && second.equals(RIGHT)) return LEFT;
+        else if (first.equals(FORWARD) && second.equals(LEFT)) return RIGHT;
+        else if (first.equals(RIGHT) && second.equals(FORWARD)) return RIGHT;
+        else if (first.equals(RIGHT) && second.equals(BACKWARD)) return LEFT;
+        else if (first.equals(LEFT) && second.equals(FORWARD)) return LEFT;
+        else if (first.equals(LEFT) && second.equals(BACKWARD)) return RIGHT;
+        else if (first.equals(second)) return first;
+        else return "";
+    }
+
 
     @Override
     public void onDirectionFailure(Throwable t){
