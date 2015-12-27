@@ -38,15 +38,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap googleMap;
     private static final String SERVER_KEY = "AIzaSyCtqKtRtaSzQJ8qYnRs9kBY4UiRqFNLsKI";
-    private LatLng camera = new LatLng(originLat, originLong);
-    private LatLng origin = new LatLng(originLat, originLong);
-    private LatLng destination = new LatLng(destinationLat, destinationLong);
+//    private LatLng camera = new LatLng(originLat, originLong);
+//    private LatLng origin = new LatLng(originLat, originLong);
+//    private LatLng destination = new LatLng(destinationLat, destinationLong);
 
     private ArrayList<Double> bearingList;
 
-//    private LatLng camera = new LatLng(22.8991066, 89.5018581);
-//    private LatLng origin = new LatLng(22.8991066, 89.5018581);
-//    private LatLng destination = new LatLng(22.8983666, 89.5012359);
+    private LatLng camera = new LatLng(22.8991066, 89.5018581);
+    private LatLng origin = new LatLng(22.8991066, 89.5018581);
+    private LatLng destination = new LatLng(22.8983666, 89.5012359);
 
     private Button requestBtn;
 
@@ -101,13 +101,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             else return RIGHT;
         }
 
-        else if ((first > 0 && first < 180) && (second > 180 && second < 360)){
+        else if ((first > 0 && first < 90) && (second > 180 && second < 360)){
             return LEFT;
         }
 
-        else if ((first > 180 && first < 360) && (second > 0 && second < 180)){
-            if (second < first) return RIGHT;
-            else return LEFT;
+        else if ((first > 90 && first < 180) && (second > 180 && second < 360)){
+            return RIGHT;
+        }
+
+        else if ((first > 180 && first < 270) && (second > 0 && second < 180)){
+            return LEFT;
+        }
+
+        else if ((first > 270 && first < 360) && (second > 0 && second < 180)){
+            return RIGHT;
         }
 
 
