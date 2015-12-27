@@ -30,17 +30,19 @@ import java.util.*;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener, DirectionCallback {
 
-    double originLat = 22.898385;
-    double originLong = 89.501238;
+    double originLat = 23.867737;
+    double originLong = 90.268602;
 
-    double destinationLat = 22.899161;
-    double destinationLong = 89.502820;
+    double destinationLat = 23.889553;
+    double destinationLong =  90.270014;
 
     private GoogleMap googleMap;
     private static final String SERVER_KEY = "AIzaSyCtqKtRtaSzQJ8qYnRs9kBY4UiRqFNLsKI";
     private LatLng camera = new LatLng(originLat, originLong);
     private LatLng origin = new LatLng(originLat, originLong);
     private LatLng destination = new LatLng(destinationLat, destinationLong);
+
+    private ArrayList<Double> bearingList;
 
 //    private LatLng camera = new LatLng(22.8991066, 89.5018581);
 //    private LatLng origin = new LatLng(22.8991066, 89.5018581);
@@ -87,6 +89,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
+    public String getDirection(double first, double second){
+        if ((first > 0 && first < 180) && (second > 0 && second < 180)){
+            if (first > second) return LEFT;
+            else return RIGHT;
+        }
+
+        else if ((first > 180 && first < 360) && (second > 180 && second < 360)){
+            if (first > second) return LEFT;
+            else return RIGHT;
+        }
+
+        else if ((first > 0 && first < 180) && (second > 180 && second < 360)){
+            return LEFT;
+        }
+
+        else if ((first > 180 && first < 360) && (second > 0 && second < 180)){
+            if (second < first) return RIGHT;
+            else return LEFT;
+        }
+
+
+        return "";
+    }
+
+
+    public double getAngle(LatLng first, LatLng second){
+        double lat1 = first.latitude;
+        double lat2 = second.latitude;
+        double lon1 = first.longitude;
+        double lon2 = second.longitude;
+
+        double dlon = lon2 - lon1;
+        double y = Math.sin(Math.toRadians(dlon)) * Math.cos(Math.toRadians(lat2));
+        double x = Math.cos(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) - Math.sin(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(dlon));
+
+        double bearing = Math.toDegrees(Math.atan2(y, x));
+
+        bearing =  (bearing + 360) % 360;
+        return  bearing;
+
+    }
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
@@ -122,6 +168,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             caughtDirections = new ArrayList<>();
             finalDirections = new ArrayList<>();
+            bearingList = new ArrayList<>();
 
             Collections.reverse(reversedLatLng);
 
@@ -133,84 +180,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
 
-            Log.i(TAG, "REVERSED: ");
-
-            for (LatLng pos : reversedLatLng){
-                Log.i(TAG, "Latitude: " + pos.latitude);
-                Log.i(TAG, "Longitude: " + pos.longitude);
+            for (int i = 1; i < sectionPositionList.size(); i++){
+                bearingList.add(getAngle(sectionPositionList.get(0), sectionPositionList.get(i)));
             }
 
-            Log.i(TAG, "NORMAL ");
 
-
-            for (int i = 0 ; i < reversedLatLng.size(); i++){
-
-                Log.i(TAG, "Latitude: " + reversedLatLng.get(i).latitude);
-            Log.i(TAG, "Longitude: " + reversedLatLng.get(i).longitude);
-        }
-
-
-
-
-
-
-            /*
-
-            Location Direction Section
-
-             */
-
-            //Start
-
-            for (int i = 1; i < sectionPositionList.size() - 1; i++){
-
-                caughtDirections.add(getDirection(sectionPositionList.get(i), sectionPositionList.get(i+1)));
-                caughtDirections.add(getDirection(sectionPositionList.get(i-1), sectionPositionList.get
-                        (i+1)));
-
-
-//                if (compareLatitude > compareLongitude) { largeLat = true; Log.i(TAG, "LARGELAT " +
-//                        "TRUE"); }
-//                else { largeLong = true; Log.i(TAG, "LARGELONG" + "TRUE"); }
-//
-//                if (largeLat){
-//                    if (first.latitude < second.latitude)  { secondLat = true; Log.i(TAG, "SECOND LAT" + "TRUE"); }
-//                    else { firstLat = true; Log.i(TAG, "FIRSTLAT" + "TRUE"); }
-//                }
-//
-//                if (largeLong){
-//                    if (first.longitude < second.longitude) { secondLong = true; Log.i(TAG, "SECOND LONG" + "TRUE"); }
-//                    else {firstLong = true; Log.i(TAG, "FIRST LONG" + "TRUE"); }
-//                }
-
-//
-//                if (secondLat) directions.add(BACKWARD);
-//                else if (firstLat) directions.add(FORWARD);
-//                if (firstLong) directions.add(RIGHT);
-//                else if (secondLong) directions.add(LEFT);
-
-
-
-
+            for (int i = 0; i < sectionPositionList.size() - 2; i++){
+                directions.add(getDirection(bearingList.get(i), bearingList.get(i+1)));
             }
 
-            Log.i(TAG, "Caught Directions Start");
-            for (String dir : caughtDirections){
-                Log.i(TAG, dir);
-            }
-            Log.i(TAG, "Caught Directions End");
 
 
-            for (int i = 0; i < caughtDirections.size() - 1; i+=2){
-                finalDirections.add(getFinalDirections(caughtDirections.get(i), caughtDirections.get(i+1)));
-            }
 
-            Log.i(TAG, "Final Directions");
-            for (String dir : finalDirections){
-                Log.i(TAG, dir);
-            }
-            Log.i(TAG, "Final Direction end");
-            //End
 
 
             List<Step> stepList = direction.getRouteList().get(0).getLegList().get(0).getStepList();
@@ -224,83 +205,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             requestBtn.setVisibility(View.GONE);
         }
 
-
+        Log.i(TAG, "PRINTING DIRECTIONS");
         for (String dir : directions){
             Log.i(TAG, dir);
         }
+        Log.i(TAG, "PRINTING DIRECTIONS DONE");
 
-    }
+        Log.i(TAG, "\n\n\n\n\n");
 
-
-    //Returns direction
-    public String getDirection(LatLng first, LatLng second){
-
-        boolean largeLat = false;
-        boolean largeLong = false;
-        boolean firstLong = false;
-        boolean firstLat = false;
-        boolean secondLat = false;
-        boolean secondLong = false;
-
-
-        double compareLongitude = second.longitude - first.longitude;
-        double compareLatitude = second.latitude - first.latitude;
-
-
-                if (compareLatitude > compareLongitude) largeLat = true;
-                else largeLong = true;
-
-        if (largeLat == true){
-            if (compareLatitude > 0) {
-                secondLat = true;
-                Log.i(TAG, "2nd Latitude > 1st");
-            }
-            else {
-                firstLat = true;
-                Log.i(TAG, "1st Latitude > 2nd");
-            }
+        Log.i(TAG, "PRINTING ANGLES");
+        for (double angle: bearingList){
+            Log.i(TAG, String.valueOf(angle));
         }
+        Log.i(TAG, "PRINTING ANGLES DONE");
 
-        if (largeLong == true){
-            if (compareLongitude > 0) {
-                secondLong = true;
-                Log.i(TAG, "2nd Longitude > 1st");
-            }
-            else {
-                firstLong = true;
-                Log.i(TAG, "1st Longitude > 2nd");
-            }
-        }
-
-        if (secondLat == true)  { Log.i(TAG, FORWARD);  return FORWARD; }
-        if (firstLat == true) {
-            Log.i(TAG, BACKWARD);
-            return BACKWARD;
-        }
-        if (secondLong == true) {
-            Log.i(TAG, RIGHT);
-            return RIGHT;
-        }
-        if (firstLong == true) {
-            Log.i(TAG, LEFT);
-            return LEFT;
-        }
-
-        return "";
-    }
-
-
-    public String getFinalDirections(String first, String second){
-        if (first.equals(BACKWARD) && second.equals(RIGHT)) return RIGHT;
-        else if (first.equals(BACKWARD) && second.equals(LEFT)) return LEFT;
-        else if (first.equals(FORWARD) && second.equals(RIGHT)) return LEFT;
-        else if (first.equals(FORWARD) && second.equals(LEFT)) return RIGHT;
-        else if (first.equals(RIGHT) && second.equals(FORWARD)) return RIGHT;
-        else if (first.equals(RIGHT) && second.equals(BACKWARD)) return LEFT;
-        else if (first.equals(LEFT) && second.equals(FORWARD)) return LEFT;
-        else if (first.equals(LEFT) && second.equals(BACKWARD)) return RIGHT;
-        else if (first.equals(second)) return first;
-        else return "";
     }
 
 
