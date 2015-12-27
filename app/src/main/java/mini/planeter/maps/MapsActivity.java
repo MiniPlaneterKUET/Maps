@@ -30,23 +30,34 @@ import java.util.*;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener, DirectionCallback {
 
-    double originLat = 23.867737;
-    double originLong = 90.268602;
+    double originLat = 23.725544;
+    double originLong = 90.3937393;
 
-    double destinationLat = 23.889553;
-    double destinationLong =  90.270014;
+    double destinationLat = 23.725937;
+    double destinationLong =  90.390123;
 
     private GoogleMap googleMap;
     private static final String SERVER_KEY = "AIzaSyCtqKtRtaSzQJ8qYnRs9kBY4UiRqFNLsKI";
-//    private LatLng camera = new LatLng(originLat, originLong);
-//    private LatLng origin = new LatLng(originLat, originLong);
-//    private LatLng destination = new LatLng(destinationLat, destinationLong);
+
+    private LatLng camera = new LatLng(originLat, originLong);
+    private LatLng origin = new LatLng(originLat, originLong);
+    private LatLng destination = new LatLng(destinationLat, destinationLong);
 
     private ArrayList<Double> bearingList;
 
-    private LatLng camera = new LatLng(22.8991066, 89.5018581);
-    private LatLng origin = new LatLng(22.8991066, 89.5018581);
-    private LatLng destination = new LatLng(22.8983666, 89.5012359);
+
+
+    //BUET
+    //    private LatLng camera = new LatLng(23.725544, 90.3937393);
+//    private LatLng origin = new LatLng(23.725544, 90.3937393);
+//    private LatLng destination = new LatLng(23.725937, 90.390123);
+
+
+
+    //KUET
+//    private LatLng camera = new LatLng(22.8991066, 89.5018581);
+//    private LatLng origin = new LatLng(22.8991066, 89.5018581);
+//    private LatLng destination = new LatLng(22.8983666, 89.5012359);
 
     private Button requestBtn;
 
