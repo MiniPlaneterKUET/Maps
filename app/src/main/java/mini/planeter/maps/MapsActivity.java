@@ -30,21 +30,22 @@ import java.util.*;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener, DirectionCallback {
 
-    double originLat = 23.725544;
-    double originLong = 90.3937393;
+    double originLat = 22.460390;
+    double originLong = 91.969615;
 
-    double destinationLat = 23.725937;
-    double destinationLong =  90.390123;
+    double destinationLat = 22.469093;
+    double destinationLong =  91.973457;
 
     private GoogleMap googleMap;
     private static final String SERVER_KEY = "AIzaSyCtqKtRtaSzQJ8qYnRs9kBY4UiRqFNLsKI";
 
-    private LatLng camera = new LatLng(originLat, originLong);
-    private LatLng origin = new LatLng(originLat, originLong);
-    private LatLng destination = new LatLng(destinationLat, destinationLong);
+//    private LatLng camera = new LatLng(originLat, originLong);
+//    private LatLng origin = new LatLng(originLat, originLong);
+//    private LatLng destination = new LatLng(destinationLat, destinationLong);
 
     private ArrayList<Double> bearingList;
 
+    //http://googlemaps.github.io/android-maps-utils/javadoc/com/google/maps/android/SphericalUtil.html#computeHeading-LatLng-LatLng-
 
 
     //BUET
@@ -55,9 +56,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //KUET
-//    private LatLng camera = new LatLng(22.8991066, 89.5018581);
-//    private LatLng origin = new LatLng(22.8991066, 89.5018581);
-//    private LatLng destination = new LatLng(22.8983666, 89.5012359);
+    private LatLng camera = new LatLng(22.8991066, 89.5018581);
+    private LatLng origin = new LatLng(22.8991066, 89.5018581);
+    private LatLng destination = new LatLng(22.8983666, 89.5012359);
 
     private Button requestBtn;
 
@@ -221,6 +222,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             requestBtn.setVisibility(View.GONE);
+
+
+            for(Step step : stepList){
+                String instruc = step.getHtmlInstruction();
+                Log.i(TAG, "INSTRUCTIONS: " + instruc);
+            }
         }
 
         Log.i(TAG, "PRINTING DIRECTIONS");
@@ -236,6 +243,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.i(TAG, String.valueOf(angle));
         }
         Log.i(TAG, "PRINTING ANGLES DONE");
+
+
+
+
 
     }
 
